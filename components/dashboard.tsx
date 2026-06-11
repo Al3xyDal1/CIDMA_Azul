@@ -1,27 +1,59 @@
 "use client"
 
+import {
+  Activity,
+  Banknote,
+  BarChart3,
+  CircleDollarSign,
+  Gauge as GaugeIcon,
+  LineChart,
+  Package,
+  TrafficCone,
+  TrendingDown,
+  Zap,
+  Clock,
+  Download,
+} from "lucide-react"
+
 import { useMemo, useState } from "react"
 
 import { useMqttCell } from "@/hooks/use-mqtt-cell"
 
-import { Gauge } from "@/components/gauge"
-import { KpiCard } from "@/components/kpi-card"
-import { SpcChart } from "@/components/spc-chart"
-import { TrafficLight } from "@/components/traffic-light"
 import { ConnectionIndicator } from "@/components/connection-indicator"
+import { SectionHeader } from "@/components/section-header"
+import { KpiCard } from "@/components/kpi-card"
+import { TrafficLight } from "@/components/traffic-light"
+import { SpcChart } from "@/components/spc-chart"
 import { ProductionSection } from "@/components/production-section"
+import { Gauge } from "@/components/gauge"
+
+import { Button } from "@/components/ui/button"
+
+import {
+  formatMXN,
+  formatNumber,
+  formatClock,
+  formatDuration,
+} from "@/lib/format"
 
 export function Dashboard() {
 
   const {
+    status,
     data,
     history,
-    status
+    lastUpdate,
   } = useMqttCell()
 
+  // ===========================================================================
+  // TIME FILTER
+  // ===========================================================================
   const [timeFilter, setTimeFilter] =
     useState("5m")
 
+  // ===========================================================================
+  // FILTERED HISTORY
+  // ===========================================================================
   const filteredHistory = useMemo(() => {
 
     const now =
@@ -55,6 +87,9 @@ export function Dashboard() {
 
   }, [history, timeFilter])
 
+  // ===========================================================================
+  // EXPORT CSV
+  // ===========================================================================
   const exportCSV = () => {
 
     if (!history.length) return
@@ -131,159 +166,396 @@ export function Dashboard() {
     document.body.removeChild(link)
   }
 
-  if (!data) {
-
-    return (
-
-      <div className="
-        min-h-screen
-        bg-black
-        text-white
-        flex
-        items-center
-        justify-center
-      ">
-        Waiting for MQTT data...
-      </div>
-    )
-  }
-
   return (
 
-    <div className="
-      min-h-screen
-      bg-black
-      text-white
-      p-6
-    ">
+    <div className="min-h-screen bg-background">
 
-      <div className="
-        flex
-        justify-between
-        items-center
-        mb-8
-      ">
-
-        <div>
-
-          <h1 className="
-            text-4xl
-            font-bold
-          ">
-            Proceso Celda de Manufactura CIDMA
-          </h1>
-
-          <p className="
-            text-zinc-400
-            mt-2
-          ">
-            Equipo Azul
-          </p>
-
-        </div>
-
-        <ConnectionIndicator
-          status={status}
-        />
-
-      </div>
-
-      <div className="
-        grid
-        grid-cols-1
-        md:grid-cols-2
-        xl:grid-cols-4
-        gap-4
-        mb-8
-      ">
-
-        <KpiCard
-          label="Bottle Cost"
-          value={data.AZUL_TotalRevenue_MXN}
-          unit="MXN"
-        />
-
-        <KpiCard
-          label="Money Lost"
-          value={data.AZUL_MoneyLost_MXN}
-          unit="MXN"
-        />
-
-        <KpiCard
-          label="Energy Cost"
-          value={data.AZUL_EnergyCost_MXN}
-          unit="MXN"
-        />
-
-        <KpiCard
-          label="Energy"
-          value={data.AZUL_Energy_kWh}
-          unit="kWh"
-        />
-
-      </div>
-
-      <div className="
-        grid
-        grid-cols-1
-        xl:grid-cols-3
-        gap-6
-        mb-8
+      {/* =============================================================== */}
+      {/* HEADER */}
+      {/* =============================================================== */}
+      <header className="
+        sticky
+        top-0
+        z-20
+        border-b
+        border-border
+        bg-background/80
+        backdrop-blur-xl
       ">
 
         <div className="
-          xl:col-span-2
-          bg-zinc-950
-          border
-          border-zinc-800
-          rounded-2xl
-          p-6
+          mx-auto
+          flex
+          max-w-7xl
+          flex-col
+          gap-3
+          px-4
+          py-4
+          md:flex-row
+          md:items-center
+          md:justify-between
+          md:px-6
+          md:py-5
         ">
-
-          <h2 className="
-            text-xl
-            font-semibold
-            mb-6
-          ">
-            OEE Monitoring
-          </h2>
 
           <div className="
             flex
-            flex-col
-            xl:flex-row
-            gap-8
             items-center
+            gap-3
           ">
 
-            <Gauge
-              label="OEE"
-              value={data.AZUL_OEE}
-              size="lg"
-            />
+            <div className="
+              flex
+              h-11
+              w-11
+              items-center
+              justify-center
+              rounded-xl
+              bg-primary/15
+              text-primary
+              glow-primary
+            ">
+
+              <Activity className="h-6 w-6" />
+
+            </div>
+
+            <div>
+
+              <h1 className="
+                text-balance
+                text-xl
+                font-semibold
+                tracking-tight
+                text-foreground
+                md:text-2xl
+              ">
+                CIDMA Manufacturing Cell Process
+              </h1>
+
+              <p className="
+                text-sm
+                font-medium
+                text-primary
+              ">
+                Blue Team
+              </p>
+
+            </div>
+
+          </div>
+
+          <div className="
+            flex
+            items-center
+            gap-3
+          ">
 
             <div className="
-              grid
-              grid-cols-3
-              gap-4
-              w-full
+              hidden
+              items-center
+              gap-2
+              rounded-full
+              border
+              border-border
+              bg-card/60
+              px-3.5
+              py-2
+              text-xs
+              text-muted-foreground
+              backdrop-blur-sm
+              sm:flex
+            ">
+
+              <Clock className="h-3.5 w-3.5" />
+
+              <span className="
+                font-mono
+                tabular-nums
+              ">
+                {formatClock(data?.ts)}
+              </span>
+
+            </div>
+
+            <ConnectionIndicator
+              status={status}
+            />
+
+          </div>
+
+        </div>
+
+      </header>
+
+      {/* =============================================================== */}
+      {/* MAIN */}
+      {/* =============================================================== */}
+      <main className="
+        mx-auto
+        max-w-7xl
+        space-y-12
+        px-4
+        py-8
+        md:px-6
+        md:py-10
+      ">
+
+        {/* =========================================================== */}
+        {/* FINANCIAL */}
+        {/* =========================================================== */}
+        <section>
+
+          <SectionHeader
+            title="Financial and Energy Indicators"
+            subtitle="Accumulated production value, losses and energy footprint"
+            icon={
+              <CircleDollarSign className="h-5 w-5" />
+            }
+            accent="primary"
+          />
+
+          <div className="
+            grid
+            grid-cols-1
+            gap-4
+            sm:grid-cols-2
+            xl:grid-cols-4
+          ">
+
+            <KpiCard
+              label="Bottle Production Cost"
+              value={formatMXN(data?.AZUL_TotalRevenue_MXN ?? 0)}
+              hint="Accumulated value of produced bottles"
+              icon={<Banknote className="h-5 w-5" />}
+              accent="primary"
+            />
+
+            <KpiCard
+              label="Money Lost"
+              value={formatMXN(data?.AZUL_MoneyLost_MXN ?? 0)}
+              hint="Cost of defective output"
+              icon={<TrendingDown className="h-5 w-5" />}
+              accent="danger"
+            />
+
+            <KpiCard
+              label="Energy Cost"
+              value={formatMXN(data?.AZUL_EnergyCost_MXN ?? 0)}
+              hint="Electricity expenditure"
+              icon={<CircleDollarSign className="h-5 w-5" />}
+              accent="warning"
+            />
+
+            <KpiCard
+              label="Energy Consumption"
+              value={formatNumber(data?.AZUL_Energy_kWh ?? 0, 2)}
+              unit="kWh"
+              hint="Total cell consumption"
+              icon={<Zap className="h-5 w-5" />}
+              accent="accent"
+            />
+
+          </div>
+
+        </section>
+
+        {/* =========================================================== */}
+        {/* TRAFFIC LIGHT */}
+        {/* =========================================================== */}
+        <section>
+
+          <SectionHeader
+            title="Process Status"
+            subtitle="Live operational state of the manufacturing cell"
+            icon={<TrafficCone className="h-5 w-5" />}
+            accent="warning"
+          />
+
+          <TrafficLight
+            value={data?.AZUL_TrafficLight ?? 0}
+          />
+
+        </section>
+
+        {/* =========================================================== */}
+        {/* SPC */}
+        {/* =========================================================== */}
+        <section>
+
+          <SectionHeader
+            title="Kalman Filter and Statistical Process Control"
+            subtitle="Historical and real-time monitoring of filling stability and control limits"
+            icon={<LineChart className="h-5 w-5" />}
+            accent="accent"
+          />
+
+          {/* FILTER BAR */}
+          <div className="
+            mb-5
+            flex
+            flex-wrap
+            items-center
+            gap-2
+          ">
+
+            <Button
+              variant={
+                timeFilter === "5m"
+                  ? "default"
+                  : "outline"
+              }
+              onClick={() =>
+                setTimeFilter("5m")
+              }
+            >
+              5 Min
+            </Button>
+
+            <Button
+              variant={
+                timeFilter === "1h"
+                  ? "default"
+                  : "outline"
+              }
+              onClick={() =>
+                setTimeFilter("1h")
+              }
+            >
+              1 Hour
+            </Button>
+
+            <Button
+              variant={
+                timeFilter === "1d"
+                  ? "default"
+                  : "outline"
+              }
+              onClick={() =>
+                setTimeFilter("1d")
+              }
+            >
+              1 Day
+            </Button>
+
+            <Button
+              variant={
+                timeFilter === "1m"
+                  ? "default"
+                  : "outline"
+              }
+              onClick={() =>
+                setTimeFilter("1m")
+              }
+            >
+              1 Month
+            </Button>
+
+            <div className="ml-auto">
+
+              <Button
+                variant="secondary"
+                onClick={exportCSV}
+              >
+
+                <Download className="
+                  mr-2
+                  h-4
+                  w-4
+                " />
+
+                Export CSV
+
+              </Button>
+
+            </div>
+
+          </div>
+
+          <SpcChart
+            history={filteredHistory}
+          />
+
+        </section>
+
+        {/* =========================================================== */}
+        {/* PRODUCTION */}
+        {/* =========================================================== */}
+        <section>
+
+          <SectionHeader
+            title="Bottle Production Monitoring"
+            subtitle="Completed bottles by station"
+            icon={<Package className="h-5 w-5" />}
+            accent="success"
+          />
+
+          <ProductionSection
+            robot={data?.AZUL_RobotCompleted ?? 0}
+            camera={data?.AZUL_CameraCompleted ?? 0}
+            warehouse={data?.AZUL_WarehouseCompleted ?? 0}
+            good={data?.AZUL_GoodBottles ?? 0}
+            bad={data?.AZUL_BadBottles ?? 0}
+          />
+
+        </section>
+
+        {/* =========================================================== */}
+        {/* OEE */}
+        {/* =========================================================== */}
+        <section>
+
+          <SectionHeader
+            title="Overall Equipment Effectiveness"
+            subtitle="Global process efficiency and performance indicators"
+            icon={<GaugeIcon className="h-5 w-5" />}
+            accent="accent"
+          />
+
+          <div className="
+            grid
+            gap-4
+            lg:grid-cols-3
+          ">
+
+            <div className="
+              flex
+              items-center
+              justify-center
+              lg:col-span-1
             ">
 
               <Gauge
+                value={data?.AZUL_OEE ?? 0}
+                label="OEE"
+                size="lg"
+              />
+
+            </div>
+
+            <div className="
+              grid
+              grid-cols-1
+              gap-4
+              sm:grid-cols-3
+              lg:col-span-2
+            ">
+
+              <Gauge
+                value={data?.AZUL_Availability ?? 0}
                 label="Availability"
-                value={data.AZUL_Availability}
                 size="sm"
               />
 
               <Gauge
+                value={data?.AZUL_Performance ?? 0}
                 label="Performance"
-                value={data.AZUL_Performance}
                 size="sm"
               />
 
               <Gauge
+                value={data?.AZUL_Quality ?? 0}
                 label="Quality"
-                value={data.AZUL_Quality}
                 size="sm"
               />
 
@@ -291,154 +563,55 @@ export function Dashboard() {
 
           </div>
 
-        </div>
+        </section>
 
-        <div className="
-          bg-zinc-950
-          border
-          border-zinc-800
-          rounded-2xl
-          p-6
-        ">
-
-          <h2 className="
-            text-xl
-            font-semibold
-            mb-6
-          ">
-            Process Status
-          </h2>
-
-          <TrafficLight
-            value={data.AZUL_TrafficLight}
-          />
-
-        </div>
-
-      </div>
-
-      <div className="
-        bg-zinc-950
-        border
-        border-zinc-800
-        rounded-2xl
-        p-6
-        mb-8
-      ">
-
-        <div className="
+        {/* =========================================================== */}
+        {/* FOOTER */}
+        {/* =========================================================== */}
+        <footer className="
           flex
+          flex-col
           items-center
+          justify-between
           gap-2
-          mb-6
+          border-t
+          border-border
+          pt-6
+          text-xs
+          text-muted-foreground
+          sm:flex-row
         ">
 
-          <button
-            onClick={() =>
-              setTimeFilter("5m")
-            }
-            className={`
-              px-4
-              py-2
-              rounded-lg
-              transition
-              ${
-                timeFilter === "5m"
-                  ? "bg-cyan-500 text-black"
-                  : "bg-zinc-800 text-zinc-300"
-              }
-            `}
-          >
-            5 Min
-          </button>
+          <span className="
+            flex
+            items-center
+            gap-2
+          ">
 
-          <button
-            onClick={() =>
-              setTimeFilter("1h")
-            }
-            className={`
-              px-4
-              py-2
-              rounded-lg
-              transition
-              ${
-                timeFilter === "1h"
-                  ? "bg-cyan-500 text-black"
-                  : "bg-zinc-800 text-zinc-300"
-              }
-            `}
-          >
-            1 Hour
-          </button>
+            <BarChart3 className="h-3.5 w-3.5" />
 
-          <button
-            onClick={() =>
-              setTimeFilter("1d")
-            }
-            className={`
-              px-4
-              py-2
-              rounded-lg
-              transition
-              ${
-                timeFilter === "1d"
-                  ? "bg-cyan-500 text-black"
-                  : "bg-zinc-800 text-zinc-300"
-              }
-            `}
-          >
-            1 Day
-          </button>
+            CIDMA Smart Factory · HiveMQ · /Tec/Pue/Ingles/Azul/Celda
 
-          <button
-            onClick={() =>
-              setTimeFilter("1m")
-            }
-            className={`
-              px-4
-              py-2
-              rounded-lg
-              transition
-              ${
-                timeFilter === "1m"
-                  ? "bg-cyan-500 text-black"
-                  : "bg-zinc-800 text-zinc-300"
-              }
-            `}
-          >
-            1 Month
-          </button>
+          </span>
 
-          <button
-            onClick={exportCSV}
-            className="
-              ml-auto
-              px-4
-              py-2
-              rounded-lg
-              bg-emerald-500
-              hover:bg-emerald-400
-              text-black
-            "
-          >
-            Export CSV
-          </button>
+          <span className="
+            font-mono
+            tabular-nums
+          ">
 
-        </div>
+            {data
+              ? `Active ${formatDuration(
+                  data.AZUL_ActiveTime_s
+                )} / Elapsed ${formatDuration(
+                  data.AZUL_ElapsedTime_s
+                )}`
+              : "Awaiting telemetry…"}
 
-        <SpcChart
-          history={filteredHistory}
-        />
+          </span>
 
-      </div>
+        </footer>
 
-      <ProductionSection
-        robot={data.AZUL_RobotCompleted}
-        camera={data.AZUL_CameraCompleted}
-        warehouse={data.AZUL_WarehouseCompleted}
-        good={data.AZUL_GoodBottles}
-        bad={data.AZUL_BadBottles}
-      />
+      </main>
 
     </div>
   )
