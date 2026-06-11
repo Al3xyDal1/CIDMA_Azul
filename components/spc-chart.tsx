@@ -57,7 +57,16 @@ export function SpcChart({
 
   return (
 
-    <div className="h-[500px] w-full">
+    <div className="
+      h-[500px]
+      w-full
+      rounded-3xl
+      border
+      border-border
+      bg-card/40
+      p-4
+      backdrop-blur-xl
+    ">
 
       <ResponsiveContainer
         width="100%"
@@ -65,7 +74,12 @@ export function SpcChart({
       >
 
         <LineChart
+          syncId="spc"
           data={formattedData}
+          style={{
+            filter:
+              "drop-shadow(0 0 10px rgba(6,182,212,0.08))"
+          }}
           margin={{
             top: 20,
             right: 20,
@@ -76,11 +90,13 @@ export function SpcChart({
 
           <CartesianGrid
             strokeDasharray="3 3"
-            stroke="#27272a"
+            stroke="#1f2937"
+            opacity={0.6}
           />
 
           <XAxis
             dataKey="time"
+            minTickGap={40}
             stroke="#71717a"
             tick={{
               fill: "#a1a1aa",
@@ -89,6 +105,7 @@ export function SpcChart({
           />
 
           <YAxis
+            domain={["auto", "auto"]}
             stroke="#71717a"
             tick={{
               fill: "#a1a1aa",
@@ -96,25 +113,49 @@ export function SpcChart({
             }}
           />
 
-          <Tooltip />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "#09090b",
+              border: "1px solid #27272a",
+              borderRadius: "12px",
+              color: "#fafafa",
+            }}
+          />
 
-          <Legend />
+          <Legend
+            wrapperStyle={{
+              paddingTop: 18,
+              fontSize: 14,
+            }}
+          />
 
           <Line
             type="monotone"
             dataKey="AZUL_CameraKalman"
-            stroke="#06b6d4"
-            strokeWidth={3}
+            stroke="#00c8ff"
+            strokeWidth={2.8}
             dot={false}
-            name="Kalman"
+            activeDot={{
+              r: 5,
+            }}
+            name="Kalman Filter"
+          />
+
+          <Line
+            type="monotone"
+            dataKey="AZUL_CameraLCL"
+            stroke="#facc15"
+            strokeWidth={2}
+            strokeDasharray="6 4"
+            dot={false}
+            name="LCL"
           />
 
           <Line
             type="monotone"
             dataKey="AZUL_CameraMean"
-            stroke="#22c55e"
+            stroke="#2dd4bf"
             strokeWidth={2}
-            strokeDasharray="5 5"
             dot={false}
             name="Mean"
           />
@@ -122,27 +163,19 @@ export function SpcChart({
           <Line
             type="monotone"
             dataKey="AZUL_CameraUCL"
-            stroke="#ef4444"
+            stroke="#ff4d5a"
             strokeWidth={2}
-            strokeDasharray="10 5"
+            strokeDasharray="6 4"
             dot={false}
             name="UCL"
           />
 
-          <Line
-            type="monotone"
-            dataKey="AZUL_CameraLCL"
-            stroke="#f97316"
-            strokeWidth={2}
-            strokeDasharray="10 5"
-            dot={false}
-            name="LCL"
-          />
-
           <Brush
             dataKey="time"
-            height={30}
+            height={28}
             stroke="#06b6d4"
+            fill="#082f49"
+            travellerWidth={12}
           />
 
         </LineChart>
