@@ -42,18 +42,11 @@ export function Dashboard() {
     status,
     data,
     history,
-    lastUpdate,
   } = useMqttCell()
 
-  // ===========================================================================
-  // TIME FILTER
-  // ===========================================================================
   const [timeFilter, setTimeFilter] =
     useState("5m")
 
-  // ===========================================================================
-  // FILTERED HISTORY
-  // ===========================================================================
   const filteredHistory = useMemo(() => {
 
     const now =
@@ -87,9 +80,6 @@ export function Dashboard() {
 
   }, [history, timeFilter])
 
-  // ===========================================================================
-  // EXPORT CSV
-  // ===========================================================================
   const exportCSV = () => {
 
     if (!history.length) return
@@ -170,9 +160,7 @@ export function Dashboard() {
 
     <div className="min-h-screen bg-background">
 
-      {/* =============================================================== */}
       {/* HEADER */}
-      {/* =============================================================== */}
       <header className="
         sticky
         top-0
@@ -288,9 +276,7 @@ export function Dashboard() {
 
       </header>
 
-      {/* =============================================================== */}
       {/* MAIN */}
-      {/* =============================================================== */}
       <main className="
         mx-auto
         max-w-7xl
@@ -301,9 +287,7 @@ export function Dashboard() {
         md:py-10
       ">
 
-        {/* =========================================================== */}
         {/* FINANCIAL */}
-        {/* =========================================================== */}
         <section>
 
           <SectionHeader
@@ -360,9 +344,7 @@ export function Dashboard() {
 
         </section>
 
-        {/* =========================================================== */}
         {/* TRAFFIC LIGHT */}
-        {/* =========================================================== */}
         <section>
 
           <SectionHeader
@@ -378,9 +360,7 @@ export function Dashboard() {
 
         </section>
 
-        {/* =========================================================== */}
         {/* SPC */}
-        {/* =========================================================== */}
         <section>
 
           <SectionHeader
@@ -390,7 +370,6 @@ export function Dashboard() {
             accent="accent"
           />
 
-          {/* FILTER BAR */}
           <div className="
             mb-5
             flex
@@ -454,8 +433,15 @@ export function Dashboard() {
             <div className="ml-auto">
 
               <Button
-                variant="secondary"
                 onClick={exportCSV}
+                className="
+                  bg-emerald-500
+                  hover:bg-emerald-400
+                  text-black
+                  font-medium
+                  shadow-lg
+                  shadow-emerald-500/20
+                "
               >
 
                 <Download className="
@@ -478,9 +464,7 @@ export function Dashboard() {
 
         </section>
 
-        {/* =========================================================== */}
         {/* PRODUCTION */}
-        {/* =========================================================== */}
         <section>
 
           <SectionHeader
@@ -500,9 +484,7 @@ export function Dashboard() {
 
         </section>
 
-        {/* =========================================================== */}
         {/* OEE */}
-        {/* =========================================================== */}
         <section>
 
           <SectionHeader
@@ -565,9 +547,7 @@ export function Dashboard() {
 
         </section>
 
-        {/* =========================================================== */}
         {/* FOOTER */}
-        {/* =========================================================== */}
         <footer className="
           flex
           flex-col
